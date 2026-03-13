@@ -1,3 +1,4 @@
+import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 
@@ -5,7 +6,7 @@ interface Pokemon {
   name: string;
   image: string;
   imageShiny: string;
-  types: PokemonType;
+  types: PokemonType[];
 }
 
 interface PokemonType {
@@ -68,16 +69,37 @@ export default function Index() {
   }
 
   return (
-    <ScrollView>
+    <ScrollView
+      contentContainerStyle={{
+        gap: 16,
+        padding: 16,
+      }}
+    >
       {pokemons.map((pokemon) => (
-        <View key={pokemon.name} style={{ backgroundColor: "blue" }}>
-          <Text style={styles.name}>{pokemon.name}</Text>
-          <Text style={styles.type}>{pokemon.types[0].type.name}</Text>
-          <View style={{ flexDirection: "row" }}>
-            <Image source={{ uri: pokemon.image }} style={styles.image} />
-            <Image source={{ uri: pokemon.imageShiny }} style={styles.image} />
+        <Link
+          href={{ pathname: "/details", params: { name: pokemon.name } }}
+          key={pokemon.name}
+        >
+          <View
+            style={{
+              // @ts-ignore
+              backgroundColor: colorsByType[pokemon.types[0].type.name],
+              padding: 20,
+              borderRadius: 20,
+            }}
+          >
+            <Text style={styles.name}>{pokemon.name}</Text>
+            <Text style={styles.type}>{pokemon.types[0].type.name}</Text>
+
+            <View style={{ flexDirection: "row" }}>
+              <Image source={{ uri: pokemon.image }} style={styles.image} />
+              <Image
+                source={{ uri: pokemon.imageShiny }}
+                style={styles.image}
+              />
+            </View>
           </View>
-        </View>
+        </Link>
       ))}
     </ScrollView>
   );
@@ -91,10 +113,12 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 30,
     fontWeight: "bold",
+    textAlign: "center",
   },
   type: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#5a5a5a",
+    color: "#fdfdfd",
+    textAlign: "center",
   },
 });
