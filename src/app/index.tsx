@@ -5,7 +5,7 @@ import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 interface Pokemon {
   name: string;
   image: string;
-  imageShiny: string;
+  imageBack: string;
   types: PokemonType[];
 }
 
@@ -46,7 +46,9 @@ export default function Index() {
 
   async function fetchPokemons() {
     try {
-      const reponse = await fetch("https://pokeapi.co/api/v2/pokemon?limit=10");
+      const reponse = await fetch(
+        "https://pokeapi.co/api/v2/pokemon?limit=100",
+      );
       const data = await reponse.json();
 
       const detailedPokemons = await Promise.all(
@@ -56,7 +58,7 @@ export default function Index() {
           return {
             name: pokemons.name,
             image: details.sprites.front_default,
-            imageShiny: details.sprites.front_shiny,
+            imageBack: details.sprites.back_default,
             types: details.types,
           };
         }),
@@ -93,10 +95,7 @@ export default function Index() {
 
             <View style={{ flexDirection: "row" }}>
               <Image source={{ uri: pokemon.image }} style={styles.image} />
-              <Image
-                source={{ uri: pokemon.imageShiny }}
-                style={styles.image}
-              />
+              <Image source={{ uri: pokemon.imageBack }} style={styles.image} />
             </View>
           </View>
         </Link>
@@ -114,6 +113,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: "bold",
     textAlign: "center",
+    color: "#2e2e2e",
   },
   type: {
     fontSize: 18,

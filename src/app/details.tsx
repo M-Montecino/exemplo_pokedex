@@ -1,38 +1,81 @@
-import { Stack, useLocalSearchParams } from "expo-router";
-import { useEffect } from "react";
-import { ScrollView, StyleSheet, Text } from "react-native";
+import { useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+
+interface Pokemon {
+  name: string;
+  imageShiny: string;
+  id: string;
+  weight: string;
+  heigth: string;
+}
 
 export default function Details() {
-  const { params } = useLocalSearchParams();
+  const { name } = useLocalSearchParams();
+  const pokemonName = name.toString();
 
-  useEffect(() => {}, []);
+  const [pokemon, setPokemon] = useState<Pokemon | null>(null);
 
-  async function fecthPokemonByName(name: string) {}
+  useEffect(() => {
+    fetchPokemonByName(pokemonName);
+  }, []);
+
+  async function fetchPokemonByName(name: string) {
+    try {
+      const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
+
+      const data = await response.json();
+
+      const pokemonData = {
+        name: data.name,
+        imageShiny: data.sprites.front_shiny,
+        id: data.id,
+        weight: data.weight,
+        heigth: data.height,
+      };
+
+      setPokemon(pokemonData);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  if (!pokemon) {
+    return null;
+  }
 
   return (
-    <>
-      <Stack.Screen options={{ headerShown: true }} />
-      <ScrollView contentContainerStyle={{ gap: 16, padding: 16 }}>
-        <Text>hi!</Text>
-      </ScrollView>
-    </>
+    <ScrollView
+      contentContainerStyle={{
+        gap: 16,
+        padding: 16,
+      }}
+    >
+      <View
+        style={{
+          backgroundColor: "#fdfdfd",
+          padding: 20,
+          borderRadius: 20,
+        }}
+      >
+        <Image style={styles.image} source={{ uri: pokemon.imageShiny }} />
+        <Text style={styles.text}>ID do pokemon: {pokemon.id}</Text>
+        <Text style={styles.text}>Peso: {pokemon.weight}</Text>
+        <Text style={styles.text}>Altura: {pokemon.heigth}</Text>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   image: {
+    alignSelf: "center",
     width: 150,
     height: 150,
   },
-  name: {
-    fontSize: 30,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  type: {
+  text: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#fdfdfd",
     textAlign: "center",
+    color: "#2e2e2e",
   },
 });
